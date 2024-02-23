@@ -1,17 +1,26 @@
 const Reserva = require('../models/reserva.js');
-
+const sendConfirmationReserva= require('../routes/correoReserva.js')
 
 async function createReserva(req, res) {
   try {
     const reserva = new Reserva({
-      nombre: req.body.nombre,
-      telefono: req.body.telefono,
-      vehiculo: req.body.vehiculo,
-      ano: req.body.ano,     fecha: req.body.fecha,
-      hora: req.body.hora,
-      asientosReservados: req.body.asientosReservados  || []
+      date: req.body.date,
+        time: req.body.time,
+        nombre: req.body.nombre,
+        correo: req.body.correo,
+        telefono: req.body.telefono,
+        lugarDisponible: req.body.lugarDisponible,
+
     });
     await reserva.save();
+
+    await sendConfirmationReserva(reserva.nombre,
+      reserva.date,
+      reserva.time,
+      reserva.correo,
+      reserva.telefono,
+    );
+
 
     res.send(reserva);
   } catch (error) {
@@ -33,13 +42,11 @@ async function updateReserva(req, res) {
     const reserva = await Reserva.findByIdAndUpdate(
       req.params.id,
       {
+        date: req.body.date,
+        time: req.body.time,
         nombre: req.body.nombre,
         telefono: req.body.telefono,
-        vehiculo: req.body.vehiculo,
-        ano: req.body.ano,
-        fecha: req.body.fecha,
-        hora: req.body.hora,
-        asientosReservados: req.body.asientosReservados || []
+        lugarDisponible: req.body.lugarDisponible,
       },
       { new: true }
     );

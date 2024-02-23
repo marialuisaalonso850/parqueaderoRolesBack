@@ -1,44 +1,15 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const reserSchema = new mongoose.Schema({
- 
-  nombre: {
-    type: String,
-    required: true,
-  },
-  telefono: {
-    type: Number,
-    required: true,
-  },
-  vehiculo: {
-    type: String,
-    required: true,
-  },
-  año: { 
-    type: Number,
-    required: true,
-  },
-  fecha: {
-    type: String,
-    required: true,
-  },
-  hora: {
-    type: String,
-    required: true,
-  },
-
-  asientosReservados: [{
-    numero: {
-      type: Number,
-      required: true,
-    },
-    ocupado: {
-      type: Boolean,
-      default: false,
-    },
-  }],
+const reservaSchema = new mongoose.Schema({
+  date: { type: Date, required: true },
+  time: { type: String, required: true },
+  correo: {type: String, required: true},
+  nombre: { type: String, required: true },
+  telefono: { type: Number, required: true },
+  lugarDisponible: { type: Boolean, default: true } 
+  
 });
 
-const Reserva = mongoose.model("Reserva", reserSchema);
-module.exports = Reserva;
+const Reserva = mongoose.model('Reserva', reservaSchema);
 
+module.exports = Reserva;

@@ -1,20 +1,33 @@
 const Post = require('../models/post.js');
 
+
 async function createPost(req, res) {
   try {
     const post = new Post({
       title: req.body.title,
       content: req.body.content,
+      horarios: req.body.horarios,
+      tarifaCarro: req.body.tarifaCarro,
+      tarifaMoto: req.body.tarifaMoto,
+      telefono: req.body.telefono,
+      nosotros: req.body.nosotros,
       longitud: req.body.longitud,
       latitud: req.body.latitud,
       puestos: req.body.puestos,
+      
     });
     await post.save();
+
+    
+
     res.send(post);
+  
   } catch (error) {
     res.status(500).send(error);
   }
 }
+
+
 
 async function getAllPosts(req, res) {
   try {
@@ -32,6 +45,11 @@ async function updatePost(req, res) {
       {
         title: req.body.title, 
         content: req.body.content,
+        horarios: req.body.horarios,
+        tarifaCarro: req.body.tarifaCarro,
+        tarifaMoto: req.body.tarifaMoto,
+        telefono: req.body.telefono,
+        nosotros: req.body.nosotros,
         longitud: req.body.longitud,
         latitud: req.body.latitud,
         puestos: req.body.puestos,
@@ -64,7 +82,6 @@ async function deletePost(req, res) {
     res.status(500).send(error);
   }
 }
-
 
 module.exports = {
   createPost,

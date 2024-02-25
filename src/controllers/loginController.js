@@ -43,3 +43,28 @@ exports.authenticateUser = async (req, res) => {
     }
 };
 
+
+// loginController.js
+exports.getUserRole = async (req, res) => {
+    try {
+      // Extrae el token de la cabecera de autorización
+      const token = req.headers.authorization.split(' ')[1];
+  
+      // Decodifica el token para obtener el ID del usuario
+      const decoded = jwt.verify(token, SECRET);
+  
+      // Busca al usuario en la base de datos
+      const user = await User.findById(decoded.id);
+  
+      if (!user) {
+        return res.status(404).json({ error: 'Usuario no encontrado.' });
+      }
+  
+      // Devuelve el rol del usuario
+      res.json({ role: user.role });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error al obtener el rol del usuario.' });
+    }
+  };
+

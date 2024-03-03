@@ -10,7 +10,7 @@ exports.refreshToken = async (req, res) => {
     const authorization= req.headers.authorization;
     const refreshToken = authorization.split(' ')[1];
     // console.log(req.headers);
-    console.log(refreshToken);
+    // console.log(refreshToken);
     if(refreshToken){
         try {
             const found = await Token.findOne({token: refreshToken})

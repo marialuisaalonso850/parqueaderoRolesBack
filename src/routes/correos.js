@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 // const password1="multiservicios1234"
-const password = "dchg feqp grow rmes"
+const password = "rvhe hydp zxzo arvt"
 const correo = "parkinlocation753@gmail.com"
 
 const transporter = nodemailer.createTransport({

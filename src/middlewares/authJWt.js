@@ -43,6 +43,7 @@ const isCliente = async (req, res, next) => {
     }
 
     if (user.role === "cliente") {
+    
       next();
     } else {
       return res.status(403).json({ message: "Require Cliente Role!" });

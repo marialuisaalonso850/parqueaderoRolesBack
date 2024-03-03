@@ -1,7 +1,7 @@
 const nodemailer = require("nodemailer");
 
 // const password1="multiservicios1234"
-const password = "dchg feqp grow rmes"
+const password = "rvhe hydp zxzo arvt"
 const correo = "parkinlocation753@gmail.com"
 
 const transporter = nodemailer.createTransport({
@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-async function sendConfirmationReserva(nombre, telefono, date, gmail, time) {
+async function sendConfirmationReserva(nombre, telefono, date, gmail, time, placa) {
   try {
     await transporter.sendMail({
       from: "parkinlocation753@gmail.com",
@@ -40,13 +40,13 @@ async function sendConfirmationReserva(nombre, telefono, date, gmail, time) {
               <br><br>
               - Nombre: ${nombre}
               <br>
-              - Teléfono: ${telefono}
+              - Fecha: ${telefono}
               <br>
-              - fecha: ${date}
+              - hora: ${date}
               <br>
-              - Hora: ${time}
+              - telefono: ${time}
               <br>
-              
+              - placa: ${placa}
               
               <br><br>
               Esperamos que disfrutes de tu estancia en nuestro parqueadero. Si tienes alguna pregunta o necesitas asistencia, no dudes en ponerte en contacto con nuestro equipo de soporte.

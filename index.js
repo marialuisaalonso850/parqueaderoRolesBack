@@ -1,12 +1,14 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const { authenticate, checkRole } = require("./src/middlewares/authenticate");
 const crypto = require("crypto");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const jwt = require('jsonwebtoken'); 
-const Token = require('./src/models/token');
+// const Token = require('./src/models/token');
+const  {authenticate}  = require("./src/middlewares/authenticate");
+
+
 
 require("dotenv").config();
 
@@ -47,14 +49,14 @@ async function connectToDatabase() {
 }
 
 app.use("/api/signup", require("./src/routes/signup"));
-app.use("/api/Login", require("./src/routes/login"));
-app.use("api/cambiorol", require("./src/routes/cambiorol"))
+app.use("/api/login", require("./src/routes/login"));
+// app.use("/api/cambiorol", require("./src/routes/cambiorol"));
 app.use("/api/signout", require("./src/routes/signout"));
 app.use("/api/todos", authenticate, require("./src/routes/todos"));
-app.use('/api/post', require('./src/routes/posts'));
-app.use('/api/reserva', require('./src/routes/reservas'));
-app.use('/api/refresh-Token', require('./src/routes/refreshToken'))
-// app.use('/api/post/new', require('./src/routes/posts'));
+app.use('/api/post',authenticate, require('./src/routes/posts'));
+app.use('/api/reserva', authenticate, require('./src/routes/reservas'));
+app.use('/api/refresh-token', require('./src/routes/refreshToken'));
+app.use("/api/user", authenticate, require('./src/routes/user'));
 
 connectToDatabase();
 
@@ -62,33 +64,6 @@ app.get("/", (req, res) => {
     res.send("Hello World");
 });
 
-app.post('/api/refresh-token', async (req, res) => {
-    try {
-        const { refreshToken } = req.body;
-    
-        if (!refreshToken) {
-            return res.status(401).json({ error: 'Unauthorized - Refresh token not provided' });
-        }
-
-        const foundToken = await Token.findOne({ token: refreshToken });
-    
-        if (!foundToken) {
-            return res.status(401).json({ error: 'Unauthorized - Refresh token not found' });
-        }
-    
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-            if (err) {
-            return res.status(401).json({ error: 'Unauthorized - Invalid refresh token' });
-            }
-    
-        const accessToken = jwt.sign({ user: user }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
-        res.json({ accessToken: accessToken });
-      });
-    } catch (error) {
-      console.error('Error refreshing token:', error);
-      return res.status(500).json({ error: 'Internal Server Error' });
-    }
-  });
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {

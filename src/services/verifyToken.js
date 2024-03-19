@@ -1,27 +1,22 @@
 const jwt = require("jsonwebtoken");
-require('dotenv').config();
 
-function verifyAccessToken(token) {
+
+function verifyAccessToken(Token) {
+    console.log("asvas"+Token);
     try {
-        if (!process.env.ACCESS_TOKEN_SECRET) {
-            throw new Error("Access token secret not defined");
-        }
-        return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        return jwt.verify(Token, process.env.ACCESS_TOKEN_SECRET);
     } catch (error) {
-        console.error("Error verifying access token:", error.message);
-        return null; // or throw an exception according to your needs
+        // Manejar errores de verificación del token aquí
+        throw new Error("Token de acceso inválido");
     }
 }
 
-function verifyRefreshToken(token) {
+function verifyRefreshToken(Token) {
     try {
-        if (!process.env.REFRESH_TOKEN_SECRET) {
-            throw new Error("Refresh token secret not defined");
-        }
-        return jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+        return jwt.verify(Token, process.env.REFRESH_TOKEN_SECRET);
     } catch (error) {
-        console.error("Error verifying refresh token:", error.message);
-        return null;
+        // Manejar errores de verificación del token aquí
+        throw new Error("Token de actualización inválido");
     }
 }
 

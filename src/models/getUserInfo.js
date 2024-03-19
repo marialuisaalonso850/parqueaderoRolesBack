@@ -1,12 +1,11 @@
-function getUserInfo(user){
-    return{
+function getUserInfo(user) {
+    return {
         gmail: user.gmail,
         username: user.username,
         id: user.id || user._id,
         role: user.role
+        
     };
-};
+}
 
-module.exports = {
-    getUserInfo
-};
+module.exports = getUserInfo;

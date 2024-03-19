@@ -6,11 +6,11 @@ const parqueaderoSchema = new mongoose.Schema({
     required: true,
   },
   latitud: {
-    type: Number,
+    type: String,
     required: true,
   },
   longitud: {
-    type: Number,
+    type: String,
     required: true,
   }
 });

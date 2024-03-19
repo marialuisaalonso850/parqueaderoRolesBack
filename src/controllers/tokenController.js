@@ -1,39 +1,40 @@
-const { getTokenFromHeader } = require('../utils/getTokenFromHeader');
-
-const { jsonResponse } = require('../controllers/jsonResponse');
+const jwt = require('jsonwebtoken'); 
 const Token = require('../models/token');
-const verifyRefreshToken = require('../services/verifyToken');
-const { generateAccessToken } = require('../services/generateTokens');
 
-exports.refreshToken = async (req, res) => {
-    // const refreshToken = getTokenFromHeader(req.headers);
-    const authorization= req.headers.authorization;
-    const refreshToken = authorization.split(' ')[1];
-    // console.log(req.headers);
-    // console.log(refreshToken);
-    if(refreshToken){
-        try {
-            const found = await Token.findOne({token: refreshToken})
-            if(!found){
-                return res.status(401).send(jsonResponse( {error: "Unauthorized"}))
-            }
-
-            const payload = verifyRefreshToken(found.token);
-
-            if(payload){
-               const accessToken = generateAccessToken(payload.use);
-
-               return res.status(200).json(jsonResponse({accessToken}))
-            }else{
-                return res.status(401).send(jsonResponse( {error: "Unauthorized"}))
-            }
-            
-        } catch (error) {
-            return res.status(401).send(jsonResponse( {error: "Unauthorized"}))
+async function refreshToken(req, res) {
+    try {
+        const { refreshToken } = req.body;
+    
+        if (!refreshToken) {
+            return res.status(401).json({ error: 'Unauthorized - Refresh token not provided' });
         }
 
-    }else{
-        res.status(401).send(jsonResponse( {error: "Unauthorized"}))
+        const foundToken = await Token.findOne({ token: refreshToken });
+    
+        if (!foundToken) {
+            return res.status(401).json({ error: 'Unauthorized - Refresh token not found' });
+        }
+    
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+            if (err) {
+                return res.status(401).json({ error: 'Unauthorized - Invalid refresh token' });
+            }
+    
+            // Aquí puedes extraer la ID del usuario del token decodificado
+            const userId = user.user.id;
+    
+            // Lógica para generar un nuevo token de acceso usando la ID del usuario
+            // Por ejemplo:
+            const accessToken = jwt.sign({ userId: userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+    
+            res.json({ accessToken: accessToken });
+        });
+    } catch (error) {
+        console.error('Error refreshing token:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
-    res.send("refresh-token");
+}
+
+module.exports = {
+    refreshToken
 };

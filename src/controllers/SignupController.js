@@ -31,20 +31,6 @@ exports.createUser = async (req, res) => {
             role,
         });
 
-        // if (roles) {
-        //     let role = await Role.findOne({ name: "user" });
-        //     if (!role) {
-        //         role = await Role.create({ name: "user" });
-        //     }
-        //     newUser.rol = [role._id];
-        // } else {
-        //     let role = await Role.findOne({ name: "user" });
-        //     if (!role) {
-        //         role = await Role.create({ name: "user" });
-        //     }
-        //     newUser.rol = [role._id];
-        // }
-
         const savedUser = await newUser.save();
         sendConfirmationEmail(gmail);
 

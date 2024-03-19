@@ -1,39 +1,31 @@
+// authenticate.mjs
+
 const { jsonResponse } = require("../controllers/jsonResponse");
-const getTokenFromHeader = require("../../src/utils/getTokenFromHeader");
-const { verifyAccessToken } = require("../../src/services/verifyToken");
+const { getTokenFromHeader } = require("../utils/getTokenFromHeader");
+const { verifyAccessToken } = require("../services/verifyToken");
 
-// Función que verifica si el usuario tiene el rol necesario
-const checkRole = (...requiredRoles) => (req, res, next) => {
-    const userRoles = req.user.roles || [];
-    const hasRequiredRole = requiredRoles.some(role => userRoles.includes(role));
-
-    if (hasRequiredRole) {
-        next();
-    } else {
-        res.status(403).json(jsonResponse(403, { message: `Acceso prohibido. Se requiere uno de los roles: ${requiredRoles.join(', ')}.` }));
-    }
-};
-
-// Función de autenticación
-async function authenticate(req, res, next) {
+function authenticate(req, res, next) {
     const token = getTokenFromHeader(req.headers);
 
-    if (token) {
-        try {
-            const decoded = verifyAccessToken(token);
+    console.log("Token:", token);
 
-            if (decoded) {
-                req.user = decoded;
-                next();
-            } else {
-                next({ status: 403, message: "Token inválido" });
-            }
-        } catch (error) {
-            next(error);
+    if (token) {
+        const decoded = verifyAccessToken(token);
+        if (decoded) {
+            req.userId = decoded.user.id; // Agregar el ID de usuario a la solicitud
+            console.log("User ID:", decoded.user.id);
+            userid = decoded.user.id;
+            next();
+        } else {
+            return res.status(401).json(jsonResponse(401, {
+                message: "Token inválido o expirado"
+            }));
         }
     } else {
-        next({ status: 401, message: "No hay token" });
+        return res.status(401).json(jsonResponse(401, {
+            message: "Token no proporcionado en el encabezado de autorización"
+        }));
     }
 }
 
-module.exports = { authenticate, checkRole };
+module.exports = { authenticate };

@@ -35,9 +35,10 @@ const generateTokenSecret = () => {
     return crypto.randomBytes(64).toString("hex");
 };
 
-process.env.ACCESS_TOKEN_SECRET = generateTokenSecret();
-process.env.REFRESH_TOKEN_SECRET = generateTokenSecret();
-
+const ACCESS_TOKEN_SECRET = generateTokenSecret();
+const REFRESH_TOKEN_SECRET = generateTokenSecret();
+process.env.ACCESS_TOKEN_SECRET = ACCESS_TOKEN_SECRET;
+process.env.REFRESH_TOKEN_SECRET = REFRESH_TOKEN_SECRET;
 async function connectToDatabase() {
     try {
         await mongoose.connect(process.env.BD_CONNECTION_STRING);

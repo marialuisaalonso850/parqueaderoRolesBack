@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 const postSchema = new mongoose.Schema({
  
@@ -26,10 +25,13 @@ const postSchema = new mongoose.Schema({
   puestos: {
     type: Number,
     required: true,
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User", // Referencia al modelo User
+    required: true
   }
 });
 
 const Post = mongoose.model("Post", postSchema);
 module.exports = Post;
-
-

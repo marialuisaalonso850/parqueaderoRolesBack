@@ -5,16 +5,15 @@ const { getTokenFromHeader } = require("../utils/getTokenFromHeader");
 const { verifyAccessToken } = require("../services/verifyToken");
 
 function authenticate(req, res, next) {
-    const token = getTokenFromHeader(req.headers);
+    const Token = getTokenFromHeader(req.headers);
 
-    console.log("Token:", token);
+    console.log("Token:", Token);
 
-    if (token) {
-        const decoded = verifyAccessToken(token);
+    if (Token) {
+        const decoded = verifyAccessToken(Token);
         if (decoded) {
-            req.userId = decoded.user.id; // Agregar el ID de usuario a la solicitud
+            req.userId = decoded.user.id; // <-- Cambiar esto
             console.log("User ID:", decoded.user.id);
-            userid = decoded.user.id;
             next();
         } else {
             return res.status(401).json(jsonResponse(401, {

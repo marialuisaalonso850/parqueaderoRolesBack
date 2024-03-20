@@ -25,7 +25,7 @@ async function refreshToken(req, res) {
     
             // Lógica para generar un nuevo token de acceso usando la ID del usuario
             // Por ejemplo:
-            const accessToken = jwt.sign({ userId: userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+            const accessToken = jwt.sign({ userId: userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 86400000 });
     
             res.json({ accessToken: accessToken });
         });

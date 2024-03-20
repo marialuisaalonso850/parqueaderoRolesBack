@@ -1,24 +1,12 @@
-const Parqueadero = require("../models/post");
-const ParqueaderoExistente = require("../models/parqueaderoExistente");
+const Post = require("../models/post");
 
+// Controlador para crear un nuevo post
 async function createPost(req, res) {
   try {
-    console.log("sssss", userid);
-    // const userId = req.userId; // ID del usuario autenticado
-
     const { title, content, horarios, tarifaCarro, tarifaMoto, telefono, nosotros, latitud, longitud, puestos } = req.body;
+    const userId = req.userId; // Obtiene el userId del usuario autenticado desde el middleware authenticate
 
-    const existente = await ParqueaderoExistente.findOne({ latitud, longitud });
-    if (!existente) {
-      return res.status(400).json({ error: "No se encontró un parqueadero existente con estas coordenadas." });
-    }
-
-    const parqueaderoExistente = await Parqueadero.findOne({ title, content, telefono, latitud, longitud });
-    if (parqueaderoExistente) {
-      return res.status(400).json({ error: "Ya existe un parqueadero con estas coordenadas." });
-    }
-
-    const parqueadero = new Parqueadero({
+    const post = new Post({
       title,
       content,
       horarios,
@@ -29,93 +17,101 @@ async function createPost(req, res) {
       latitud,
       longitud,
       puestos,
-      // userId: userId 
+      userId // Asigna el userId al campo userId del post
     });
 
-    await parqueadero.save();
-    res.send(parqueadero);
+    await post.save();
+
+    console.log("Nuevo post creado:", post);
+
+    res.status(201).json(post);
   } catch (error) {
-    console.error("Error creating post:", error);
-    res.status(500).json({ error: error.message });
+    console.error("Error creando el post:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 }
 
+
+
+// Controlador para obtener todos los posts
 async function getAllPosts(req, res) {
   try {
-    const posts = await Parqueadero.find();
-    res.send(posts);
+    // Obtener todos los posts de la base de datos
+    const posts = await Post.find();
+    res.json(posts); // Responder con los posts obtenidos
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error("Error obteniendo los posts:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 }
 
-async function updatePost(req, res) {
-  try {
-    const post = await Parqueadero.findByIdAndUpdate(
-      req.params.id,
-      {
-        title: req.body.title,
-        content: req.body.content,
-        horarios: req.body.horarios,
-        tarifaCarro: req.body.tarifaCarro,
-        tarifaMoto: req.body.tarifaMoto,
-        telefono: req.body.telefono,
-        nosotros: req.body.nosotros,
-        longitud: req.body.longitud,
-        latitud: req.body.latitud,
-        puestos: req.body.puestos,
-      },
-      { new: true }
-    );
-    if (!post) return res.status(404).send("Post not found");
-    res.send(post);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-}
-
+// Controlador para obtener un post por su ID
 async function getPostById(req, res) {
   try {
-    const post = await Parqueadero.findById(req.params.id);
-    if (!post) return res.status(404).send("Post not found");
-    res.send(post);
+    const postId = req.params.id;
+    // Buscar el post por su ID en la base de datos
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: "Post no encontrado" });
+    }
+    res.json(post); // Responder con el post encontrado
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error("Error obteniendo el post por ID:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 }
 
+// Controlador para actualizar un post por su ID
+async function updatePost(req, res) {
+  try {
+    const postId = req.params.id;
+    const { title, content, horarios, tarifaCarro, tarifaMoto, telefono, nosotros, latitud, longitud, puestos } = req.body;
+
+    // Buscar y actualizar el post por su ID en la base de datos
+    const updatedPost = await Post.findByIdAndUpdate(postId, {
+      title,
+      content,
+      horarios,
+      tarifaCarro,
+      tarifaMoto,
+      telefono,
+      nosotros,
+      latitud,
+      longitud,
+      puestos
+    }, { new: true });
+
+    if (!updatedPost) {
+      return res.status(404).json({ error: "Post no encontrado" });
+    }
+
+    res.json(updatedPost); // Responder con el post actualizado
+  } catch (error) {
+    console.error("Error actualizando el post por ID:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+}
+
+// Controlador para eliminar un post por su ID
 async function deletePost(req, res) {
   try {
     const postId = req.params.id;
-    const userId = req.userId; // ID del usuario autenticado
-
-    // Buscar el parqueadero por su ID
-    const post = await Parqueadero.findById(postId);
-    if (!post) {
-      return res.status(404).send("Parqueadero no encontrado");
-    }
-
-    // Verificar si el usuario actual es el propietario del parqueadero
-    if (post.userId !== userId) {
-      return res.status(403).send("No tienes permiso para eliminar este parqueadero");
-    }
-
-    // Eliminar el parqueadero
-    const deletedPost = await Parqueadero.findByIdAndDelete(postId);
+    // Buscar y eliminar el post por su ID en la base de datos
+    const deletedPost = await Post.findByIdAndDelete(postId);
     if (!deletedPost) {
-      return res.status(404).send("No se pudo eliminar el parqueadero");
+      return res.status(404).json({ error: "Post no encontrado" });
     }
-
-    res.send(deletedPost);
+    res.json(deletedPost); // Responder con el post eliminado
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error("Error eliminando el post por ID:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 }
 
 module.exports = {
   createPost,
   getAllPosts,
-  updatePost,
   getPostById,
+  updatePost,
   deletePost
 };

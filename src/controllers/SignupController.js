@@ -35,7 +35,7 @@ exports.createUser = async (req, res) => {
         sendConfirmationEmail(gmail);
 
         const token = jwt.sign({ savedUser }, SECRET, {
-            expiresIn: 86400,
+            expiresIn: 86400000,
         });
 
         return res.status(200).json({ token, message: 'Usuario creado.' });

@@ -1,12 +1,26 @@
 const Post = require("../models/post");
+const ParqueaderoExistente = require("../models/parqueaderoExistente");
 
-// Controlador para crear un nuevo post
+
+
 async function createPost(req, res) {
   try {
-    const { title, content, horarios, tarifaCarro, tarifaMoto, telefono, nosotros, latitud, longitud, puestos } = req.body;
-    const userId = req.userId; // Obtiene el userId del usuario autenticado desde el middleware authenticate
+   
+    const userId = req.userId; 
 
-    const post = new Post({
+    const { title, content, horarios, tarifaCarro, tarifaMoto, telefono, nosotros, latitud, longitud, puestos } = req.body;
+
+    const existente = await ParqueaderoExistente.findOne({ latitud, longitud });
+    if (!existente) {
+      return res.status(400).json({ error: "No se encontró un parqueadero existente con estas coordenadas." });
+    }
+
+    const parqueaderoExistente = await Post.findOne({ title, content, telefono, latitud, longitud });
+    if (parqueaderoExistente) {
+      return res.status(400).json({ error: "Ya existe un parqueadero con estas coordenadas." });
+    }
+
+    const parqueadero = new Post({
       title,
       content,
       horarios,
@@ -17,19 +31,18 @@ async function createPost(req, res) {
       latitud,
       longitud,
       puestos,
-      userId // Asigna el userId al campo userId del post
+      userId
     });
 
-    await post.save();
-
-    console.log("Nuevo post creado:", post);
-
-    res.status(201).json(post);
+    await parqueadero.save();
+    res.send(parqueadero);
   } catch (error) {
-    console.error("Error creando el post:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+    console.error("Error creating post:", error);
+    res.status(500).json({ error: error.message });
   }
 }
+
+
 
 
 
